@@ -365,7 +365,7 @@ DEFINE CLASS frmOrdersGeneral AS Form
         TRY
             * Agregar nueva línea
             INSERT INTO curOrderLines (productId, qty, productName) VALUES (0, 1, "Producto nuevo")
-            THIS.lblStatus.Caption = "Linea agregada - Registros: " + TRANSFORM(RECCOUNT("curOrderLines"))
+            THIS.lblStatus.Caption = "Línea agregada - Registros: " + TRANSFORM(RECCOUNT("curOrderLines"))
         CATCH TO loEx
             MESSAGEBOX("Error al insertar: " + loEx.Message, 16, "Error")
             llError = .T.
