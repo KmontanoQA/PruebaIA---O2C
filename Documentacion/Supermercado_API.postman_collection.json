@@ -1,0 +1,1045 @@
+{
+	"info": {
+		"_postman_id": "supermercado-api-collection",
+		"name": "Supermercado ERP O2C API",
+		"description": "Colección completa para el sistema ERP Order-to-Cash del Supermercado con .NET 9",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{jwt_token}}",
+				"type": "string"
+			}
+		]
+	},
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "https://localhost:7000",
+			"type": "string"
+		},
+		{
+			"key": "jwt_token",
+			"value": "",
+			"type": "string"
+		}
+	],
+	"item": [
+		{
+			"name": "Authentication",
+			"item": [
+				{
+					"name": "Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    pm.collectionVariables.set('jwt_token', jsonData.token);",
+									"    console.log('Token guardado:', jsonData.token);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"admin@supermercado.com\",\n  \"password\": \"Admin123!\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/Auth/login",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"Auth",
+								"login"
+							]
+						},
+						"description": "Autenticar usuario y obtener token JWT"
+					},
+					"response": []
+				},
+				{
+					"name": "Logout",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/Auth/logout",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"Auth",
+								"logout"
+							]
+						},
+						"description": "Cerrar sesión (cliente debe eliminar el token)"
+					},
+					"response": []
+				}
+			],
+			"description": "Endpoints de autenticación JWT"
+		},
+		{
+			"name": "Customers",
+			"item": [
+				{
+					"name": "Get All Customers",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/Customers",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"Customers"
+							]
+						},
+						"description": "Obtener todos los clientes"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Customer By ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/Customers/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"Customers",
+								"1"
+							]
+						},
+						"description": "Obtener cliente por ID"
+					},
+					"response": []
+				},
+				{
+					"name": "Create Customer",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Juan Pérez\",\n  \"email\": \"juan.perez@example.com\",\n  \"phone\": \"555-1234\",\n  \"address\": \"Calle Principal 123\",\n  \"city\": \"Ciudad\",\n  \"creditLimit\": 5000.00,\n  \"isActive\": true\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/Customers",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"Customers"
+							]
+						},
+						"description": "Crear nuevo cliente"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Customer",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"id\": 1,\n  \"name\": \"Juan Pérez Actualizado\",\n  \"email\": \"juan.perez@example.com\",\n  \"phone\": \"555-5678\",\n  \"address\": \"Calle Principal 456\",\n  \"city\": \"Ciudad\",\n  \"creditLimit\": 7500.00,\n  \"isActive\": true\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/Customers/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"Customers",
+								"1"
+							]
+						},
+						"description": "Actualizar cliente existente"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Customer",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/Customers/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"Customers",
+								"1"
+							]
+						},
+						"description": "Eliminar cliente"
+					},
+					"response": []
+				}
+			],
+			"description": "Gestión de clientes"
+		},
+		{
+			"name": "Products",
+			"item": [
+				{
+					"name": "Get All Products",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/Products",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"Products"
+							]
+						},
+						"description": "Obtener todos los productos"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Products Paginated",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/Products/paginated?page=1&pageSize=10&isActive=true",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"Products",
+								"paginated"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "pageSize",
+									"value": "10"
+								},
+								{
+									"key": "isActive",
+									"value": "true"
+								}
+							]
+						},
+						"description": "Obtener productos paginados con filtros"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Product By ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/Products/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"Products",
+								"1"
+							]
+						},
+						"description": "Obtener producto por ID"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Product By SKU",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/Products/sku/PROD-001",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"Products",
+								"sku",
+								"PROD-001"
+							]
+						},
+						"description": "Obtener producto por SKU"
+					},
+					"response": []
+				},
+				{
+					"name": "Create Product",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"sku\": \"PROD-100\",\n  \"name\": \"Producto Nuevo\",\n  \"description\": \"Descripción del producto\",\n  \"price\": 99.99,\n  \"stock\": 100,\n  \"categoryId\": 1,\n  \"isActive\": true\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/Products",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"Products"
+							]
+						},
+						"description": "Crear nuevo producto"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Product",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"id\": 1,\n  \"sku\": \"PROD-100\",\n  \"name\": \"Producto Actualizado\",\n  \"description\": \"Descripción actualizada\",\n  \"price\": 109.99,\n  \"stock\": 150,\n  \"categoryId\": 1,\n  \"isActive\": true\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/Products/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"Products",
+								"1"
+							]
+						},
+						"description": "Actualizar producto existente"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Product",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/Products/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"Products",
+								"1"
+							]
+						},
+						"description": "Eliminar producto"
+					},
+					"response": []
+				}
+			],
+			"description": "Gestión de productos"
+		},
+		{
+			"name": "Orders",
+			"item": [
+				{
+					"name": "Get Orders",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/Orders?page=1&pageSize=10&status=NEW&customerId=1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"Orders"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "pageSize",
+									"value": "10"
+								},
+								{
+									"key": "status",
+									"value": "NEW",
+									"description": "NEW, CONFIRMED, CANCELLED"
+								},
+								{
+									"key": "customerId",
+									"value": "1"
+								},
+								{
+									"key": "startDate",
+									"value": "2024-01-01",
+									"disabled": true
+								},
+								{
+									"key": "endDate",
+									"value": "2024-12-31",
+									"disabled": true
+								}
+							]
+						},
+						"description": "Obtener pedidos paginados con filtros opcionales"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Order By ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/Orders/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"Orders",
+								"1"
+							]
+						},
+						"description": "Obtener pedido por ID con detalles completos"
+					},
+					"response": []
+				},
+				{
+					"name": "Create Order",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"customerId\": 1,\n  \"orderDate\": \"2024-10-21T00:00:00Z\",\n  \"items\": [\n    {\n      \"productId\": 1,\n      \"quantity\": 5,\n      \"unitPrice\": 99.99\n    },\n    {\n      \"productId\": 2,\n      \"quantity\": 3,\n      \"unitPrice\": 49.99\n    }\n  ],\n  \"notes\": \"Pedido urgente\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/Orders",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"Orders"
+							]
+						},
+						"description": "Crear nuevo pedido"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Order",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"customerId\": 1,\n  \"items\": [\n    {\n      \"productId\": 1,\n      \"quantity\": 10,\n      \"unitPrice\": 99.99\n    }\n  ],\n  \"notes\": \"Pedido actualizado\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/Orders/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"Orders",
+								"1"
+							]
+						},
+						"description": "Actualizar pedido existente (solo en estado NEW)"
+					},
+					"response": []
+				},
+				{
+					"name": "Confirm Order",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/Orders/1/confirm",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"Orders",
+								"1",
+								"confirm"
+							]
+						},
+						"description": "Confirmar pedido (verifica stock y crea movimientos de inventario)"
+					},
+					"response": []
+				},
+				{
+					"name": "Cancel Order",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/Orders/1/cancel",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"Orders",
+								"1",
+								"cancel"
+							]
+						},
+						"description": "Cancelar pedido (reversa inventario si estaba confirmado)"
+					},
+					"response": []
+				}
+			],
+			"description": "Gestión de pedidos (Order-to-Cash)"
+		},
+		{
+			"name": "Invoices",
+			"item": [
+				{
+					"name": "Get Invoices",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/Invoices?page=1&pageSize=10&status=PENDING&customerId=1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"Invoices"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "pageSize",
+									"value": "10"
+								},
+								{
+									"key": "status",
+									"value": "PENDING",
+									"description": "PENDING, PAID, CANCELLED"
+								},
+								{
+									"key": "customerId",
+									"value": "1"
+								}
+							]
+						},
+						"description": "Obtener facturas paginadas con filtros opcionales"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Invoice By ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/Invoices/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"Invoices",
+								"1"
+							]
+						},
+						"description": "Obtener factura por ID con detalles completos"
+					},
+					"response": []
+				},
+				{
+					"name": "Create Invoice",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"orderId\": 1,\n  \"invoiceDate\": \"2024-10-21T00:00:00Z\",\n  \"dueDate\": \"2024-11-21T00:00:00Z\",\n  \"notes\": \"Factura generada desde pedido confirmado\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/Invoices",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"Invoices"
+							]
+						},
+						"description": "Crear factura desde un pedido confirmado"
+					},
+					"response": []
+				},
+				{
+					"name": "Cancel Invoice",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/Invoices/1/cancel",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"Invoices",
+								"1",
+								"cancel"
+							]
+						},
+						"description": "Cancelar factura (reversa inventario y cancela el pedido)"
+					},
+					"response": []
+				}
+			],
+			"description": "Gestión de facturas"
+		},
+		{
+			"name": "Reports",
+			"item": [
+				{
+					"name": "Sales Report",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/Reports/sales?dateFrom=2024-01-01&dateTo=2024-12-31",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"Reports",
+								"sales"
+							],
+							"query": [
+								{
+									"key": "dateFrom",
+									"value": "2024-01-01"
+								},
+								{
+									"key": "dateTo",
+									"value": "2024-12-31"
+								}
+							]
+						},
+						"description": "Reporte de ventas por rango de fechas"
+					},
+					"response": []
+				},
+				{
+					"name": "Receivables Report",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/Reports/receivables?customerId=1&asOf=2024-10-21",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"Reports",
+								"receivables"
+							],
+							"query": [
+								{
+									"key": "customerId",
+									"value": "1"
+								},
+								{
+									"key": "asOf",
+									"value": "2024-10-21"
+								}
+							]
+						},
+						"description": "Reporte de cartera (facturas pendientes)"
+					},
+					"response": []
+				},
+				{
+					"name": "Inventory Report",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/Reports/inventory",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"Reports",
+								"inventory"
+							]
+						},
+						"description": "Reporte de inventario con movimientos recientes"
+					},
+					"response": []
+				}
+			],
+			"description": "Reportes del sistema"
+		},
+		{
+			"name": "Roles",
+			"item": [
+				{
+					"name": "Get All Roles",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/Rols",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"Rols"
+							]
+						},
+						"description": "Obtener todos los roles"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Role By ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/Rols/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"Rols",
+								"1"
+							]
+						},
+						"description": "Obtener rol por ID"
+					},
+					"response": []
+				},
+				{
+					"name": "Create Role",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Vendedor\",\n  \"description\": \"Rol de vendedor\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/Rols",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"Rols"
+							]
+						},
+						"description": "Crear nuevo rol"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Role",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"id\": 1,\n  \"name\": \"Vendedor Senior\",\n  \"description\": \"Rol de vendedor senior\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/Rols",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"Rols"
+							]
+						},
+						"description": "Actualizar rol existente"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Role",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/Rols/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"Rols",
+								"1"
+							]
+						},
+						"description": "Eliminar rol"
+					},
+					"response": []
+				}
+			],
+			"description": "Gestión de roles (controlador genérico)"
+		},
+		{
+			"name": "Categories",
+			"item": [
+				{
+					"name": "Get All Categories",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/Categoria_Producto",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"Categoria_Producto"
+							]
+						},
+						"description": "Obtener todas las categorías de productos"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Category By ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/Categoria_Producto/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"Categoria_Producto",
+								"1"
+							]
+						},
+						"description": "Obtener categoría por ID"
+					},
+					"response": []
+				},
+				{
+					"name": "Create Category",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Electrónica\",\n  \"description\": \"Productos electrónicos\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/Categoria_Producto",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"Categoria_Producto"
+							]
+						},
+						"description": "Crear nueva categoría"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Category",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"id\": 1,\n  \"name\": \"Electrónica y Tecnología\",\n  \"description\": \"Productos electrónicos y tecnológicos\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/Categoria_Producto",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"Categoria_Producto"
+							]
+						},
+						"description": "Actualizar categoría existente"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Category",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/Categoria_Producto/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"Categoria_Producto",
+								"1"
+							]
+						},
+						"description": "Eliminar categoría"
+					},
+					"response": []
+				}
+			],
+			"description": "Gestión de categorías de productos (controlador genérico)"
+		}
+	]
+}

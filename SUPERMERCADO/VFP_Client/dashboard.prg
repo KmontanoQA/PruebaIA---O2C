@@ -1,0 +1,335 @@
+*==============================================================================
+* PROGRAMA : dashboard.prg
+* SISTEMA  : Sistema Gestion OC2 - Cliente Visual FoxPro
+* DESCRIPCION: Dashboard con barra lateral y tarjetas de resumen.
+*   Navegación: Customers, Products, Orders, Invoices, Reports, Roles, Categories
+*   Requiere variables globales: gcAPIBaseURL, gcToken, gcUserEmail, gcUserRole
+*==============================================================================
+
+Define Class frmDashboard As Form
+	Height = 600
+	Width = 980
+	AutoCenter = .T.
+	Caption = "Sistema Gestion OC2 - Panel Principal"
+	BorderStyle = 3
+	ShowWindow = 2
+	MaxButton = .T.
+	MinButton = .T.
+	BackColor = Rgb(245,247,252)
+
+	* Panel lateral (Navbar)
+	Add Object pnlNav As Container With ;
+		Top = 0, Left = 0, Height = 600, Width = 220, ;
+		BackColor = Rgb(28,34,53)
+
+	Add Object lblBrand As Label With ;
+		Caption = "@  OC2", ;
+		FontName = "Segoe UI", FontSize = 16, FontBold = .T., ;
+		ForeColor = Rgb(230,236,255), BackStyle = 0, ;
+		Top = 14, Left = 16, Width = 180, Height = 26
+
+	Procedure AddNavButton(tcName, tcCaption, tnTop)
+		This.AddObject(tcName, "CommandButton")
+		With This.&tcName
+			.Caption = tcCaption
+			.Top = tnTop
+			.Left = 16
+			.Width = 188
+			.Height = 34
+			.FontName = "Segoe UI"
+			.FontSize = 10
+			.ForeColor = Rgb(235,240,255)
+			.BackColor = Rgb(44,52,78)
+			.SpecialEffect = 2
+		Endwith
+	Endproc
+
+	* Encabezado superior
+	Add Object pnlHeader As Container With ;
+		Top = 0, Left = 220, Height = 64, Width = 760, ;
+		BackColor = Rgb(255,255,255)
+
+	Add Object lblWelcome As Label With ;
+		Caption = "Bienvenido, ", FontName = "Segoe UI", FontSize = 14, ;
+		ForeColor = Rgb(32,42,79), BackStyle = 0, ;
+		Top = 20, Left = 240, Width = 340, Height = 22
+
+	Add Object cmdLogout As CommandButton With ;
+		Caption = "Logout", Top = 18, Left = 600, Width = 70, Height = 26, ;
+		FontName = "Segoe UI", FontSize = 9, BackColor = Rgb(235,238,249), ;
+		ForeColor = Rgb(84,96,130)
+
+	Add Object txtSearch As TextBox With ;
+		Top = 18, Left = 680, Width = 260, Height = 26, ;
+		FontName = "Segoe UI", FontSize = 9, Value = "Buscar..."
+
+	* Área de contenido
+	Add Object pnlContent As Container With ;
+		Top = 64, Left = 220, Height = 536, Width = 760, ;
+		BackColor = Rgb(245,247,252)
+
+	* Tarjetas
+	Add Object shpCard1 As Shape With ;
+		Top = 20, Left = 20, Height = 110, Width = 220, ;
+		BackColor = Rgb(33,63,125), BorderColor = Rgb(33,63,125), ;
+		BorderWidth = 0, Curvature = 12
+	Add Object lblCard1 As Label With ;
+		Caption = "Total Sales" + Chr(13) + "$0", ;
+		FontName = "Segoe UI", FontSize = 12, FontBold = .T., ;
+		ForeColor = Rgb(255,255,255), BackStyle = 0, ;
+		Top = 34, Left = 36, Width = 180, Height = 60
+
+	Add Object shpCard2 As Shape With ;
+		Top = 20, Left = 260, Height = 110, Width = 220, ;
+		BackColor = Rgb(255,255,255), BorderColor = Rgb(230,234,244), ;
+		BorderWidth = 1, Curvature = 12
+	Add Object lblCard2 As Label With ;
+		Caption = "Orders" + Chr(13) + "0", ;
+		FontName = "Segoe UI", FontSize = 12, FontBold = .T., ;
+		ForeColor = Rgb(33,63,125), BackStyle = 0, ;
+		Top = 34, Left = 280, Width = 180, Height = 60
+
+	Add Object shpCard3 As Shape With ;
+		Top = 20, Left = 500, Height = 110, Width = 220, ;
+		BackColor = Rgb(255,255,255), BorderColor = Rgb(230,234,244), ;
+		BorderWidth = 1, Curvature = 12
+	Add Object lblCard3 As Label With ;
+		Caption = "Invoices" + Chr(13) + "0", ;
+		FontName = "Segoe UI", FontSize = 12, FontBold = .T., ;
+		ForeColor = Rgb(33,63,125), BackStyle = 0, ;
+		Top = 34, Left = 520, Width = 180, Height = 60
+
+	Add Object shpCard4 As Shape With ;
+		Top = 20, Left = 740, Height = 110, Width = 220, ;
+		BackColor = Rgb(255,255,255), BorderColor = Rgb(230,234,244), ;
+		BorderWidth = 1, Curvature = 12
+	Add Object lblCard4 As Label With ;
+		Caption = "Products" + Chr(13) + "0", ;
+		FontName = "Segoe UI", FontSize = 12, FontBold = .T., ;
+		ForeColor = Rgb(33,63,125), BackStyle = 0, ;
+		Top = 34, Left = 760, Width = 180, Height = 60
+
+	* Grilla y consola
+	Add Object grdList As Grid With ;
+		Top = 150, Left = 20, Width = 720, Height = 130
+
+	Add Object edtConsole As EditBox With ;
+		Top = 290, Left = 20, Width = 720, Height = 230, ;
+		FontName = "Consolas", FontSize = 9, ReadOnly = .T., ;
+		BackColor = Rgb(255,255,255), ForeColor = Rgb(30,30,30)
+
+	Procedure Init
+		This.AddNavButton("btnCustomers", "Customers", 64)
+		This.AddNavButton("btnProducts",  "Products",  104)
+		This.AddNavButton("btnOrders",    "Orders",    144)
+		This.AddNavButton("btnInvoices",  "Invoices",  184)
+		This.AddNavButton("btnReports",   "Reports",   224)
+		This.AddNavButton("btnRoles",     "Roles",     264)
+		This.AddNavButton("btnCategories","Categories",304)
+
+		Bindevent(This.btnCustomers, "Click", This, "OnCustomers")
+		Bindevent(This.btnProducts,  "Click", This, "OnProducts")
+		Bindevent(This.btnOrders,    "Click", This, "OnOrders")
+		Bindevent(This.btnInvoices,  "Click", This, "OnInvoices")
+		Bindevent(This.btnReports,   "Click", This, "OnReports")
+		Bindevent(This.btnRoles,     "Click", This, "OnRoles")
+		Bindevent(This.btnCategories,"Click", This, "OnCategories")
+		Bindevent(This.cmdLogout,    "Click", This, "OnLogout")
+
+		This.lblWelcome.Caption = "Bienvenido, " + Nvl(gcUserEmail, "Usuario")
+		This.PrepareListCursor()
+		This.RefreshCounts()
+	Endproc
+
+	Procedure LogMsg(tcText)
+		This.edtConsole.Value = Ttoc(Datetime()) + ": " + tcText + Chr(13)+Chr(10) + This.edtConsole.Value
+	Endproc
+
+	Procedure APIGet(tcEndpoint)
+		Local loHTTP, lcURL
+		lcURL = gcAPIBaseURL + tcEndpoint
+		Try
+			loHTTP = Createobject("WinHttp.WinHttpRequest.5.1")
+			loHTTP.Open("GET", lcURL, .F.)
+			loHTTP.SetRequestHeader("Authorization", "Bearer " + gcToken)
+			loHTTP.SetRequestHeader("Content-Type", "application/json")
+			loHTTP.Send()
+			If loHTTP.Status = 200
+				Return loHTTP.ResponseText
+			Else
+				This.LogMsg("HTTP " + Transform(loHTTP.Status) + ": " + loHTTP.StatusText)
+				Return ""
+			Endif
+		Catch To loEx
+			This.LogMsg("Error: " + loEx.Message)
+			*Return ""
+		Endtry
+	Endproc
+
+	Procedure RefreshCounts
+		Local lcOrders, lcInvoices, lcProducts
+		lcOrders   = This.APIGet("/orders?page=1&pageSize=1")
+		lcInvoices = This.APIGet("/invoices?page=1&pageSize=1")
+		lcProducts = This.APIGet("/products")
+		If !Empty(lcOrders)
+			This.lblCard2.Caption = "Orders" + Chr(13) + Transform(Occurs('"id":', lcOrders))
+		Endif
+		If !Empty(lcInvoices)
+			This.lblCard3.Caption = "Invoices" + Chr(13) + Transform(Occurs('"id":', lcInvoices))
+		Endif
+		If !Empty(lcProducts)
+			This.lblCard4.Caption = "Products" + Chr(13) + Transform(Occurs('"id":', lcProducts))
+		Endif
+	Endproc
+
+	Procedure PrepareListCursor
+		Local lcAlias
+		lcAlias = "crsList"
+		If Used(lcAlias)
+			Use In (lcAlias)
+		Endif
+		Create Cursor (lcAlias) (Id I, Name C(200))
+		This.grdList.RecordSource = lcAlias
+		This.grdList.ColumnCount = 2
+		This.grdList.Columns(1).Header1.Caption = "Id"
+		This.grdList.Columns(2).Header1.Caption = "Nombre"
+	Endproc
+
+	Procedure FillListFromJson(tcJson)
+		Local lcAlias, lnPos, lnNext, lnId, lcName
+		lcAlias = "crsList"
+		Select (lcAlias)
+		Zap
+		lnPos = 1
+		Do While lnPos > 0
+			lnPos = At('"id":', tcJson, lnPos)
+			If lnPos <= 0
+				Exit
+			Endif
+			lnPos = lnPos + 5
+			lnId = Val(Substr(tcJson, lnPos, 12))
+			lcName = This.JsonGetString(tcJson, "name", lnPos)
+			If Empty(lcName)
+				lcName = This.JsonGetString(tcJson, "Number", lnPos)
+			Endif
+			If Empty(lcName)
+				lcName = This.JsonGetString(tcJson, "sku", lnPos)
+			Endif
+			Insert Into (lcAlias) (Id, Name) Values (lnId, lcName)
+			lnNext = At("}", tcJson, lnPos)
+			If lnNext <= 0
+				Exit
+			Endif
+			lnPos = lnNext + 1
+		Enddo
+		Go Top In (lcAlias)
+	Endproc
+
+	Procedure JsonGetString(tcJson, tcKey, tnStart)
+		Local lcTokenKey, lnStart, lnEnd, lcValue
+		lcTokenKey = '"' + tcKey + '":'
+		lnStart = Iif(Vartype(tnStart)='N' And tnStart>0, tnStart, 1)
+		lnStart = At(lcTokenKey, tcJson, lnStart)
+		If lnStart = 0
+			Return ""
+		Endif
+		lnStart = lnStart + Len(lcTokenKey)
+		If Substr(tcJson, lnStart, 1) = '"'
+			lnStart = lnStart + 1
+			lnEnd = At('"', tcJson, lnStart)
+		Else
+			lnEnd = At(",", tcJson + ",", lnStart)
+		Endif
+		If lnEnd > lnStart
+			lcValue = Substr(tcJson, lnStart, lnEnd - lnStart)
+			lcValue = Strtran(lcValue, '\"\"', '"')
+			lcValue = Strtran(lcValue, '\\"', '"')
+			Return lcValue
+		Endif
+		Return ""
+	Endproc
+
+	Procedure OnCustomers
+		Local lcJson
+		lcJson = This.APIGet("/customers")
+		If !Empty(lcJson)
+			This.FillListFromJson(lcJson)
+			This.LogMsg("Customers cargados. Registros: " + Transform(Reccount("crsList")))
+		Endif
+	Endproc
+
+	Procedure OnProducts
+		Local lcJson
+		lcJson = This.APIGet("/products")
+		If !Empty(lcJson)
+			This.FillListFromJson(lcJson)
+			This.LogMsg("Products cargados. Registros: " + Transform(Reccount("crsList")))
+		Endif
+	Endproc
+
+	Procedure OnOrders
+		Local lcJson
+		lcJson = This.APIGet("/orders?page=1&pageSize=10")
+		If !Empty(lcJson)
+			This.FillListFromJson(lcJson)
+			This.LogMsg("Orders cargados")
+		Endif
+	Endproc
+
+	Procedure OnInvoices
+		Local lcJson
+		lcJson = This.APIGet("/invoices?page=1&pageSize=10")
+		If !Empty(lcJson)
+			This.FillListFromJson(lcJson)
+			This.LogMsg("Invoices cargadas")
+		Endif
+	Endproc
+
+	Procedure OnReports
+		Local ldFrom, ldTo, lcJson
+		ldFrom = Date() - 30
+		ldTo   = Date()
+		lcJson = This.APIGet("/reports/sales?dateFrom=" + Ttoc(ldFrom,1) + "&dateTo=" + Ttoc(ldTo,1))
+		If !Empty(lcJson)
+			This.LogMsg("Reporte de ventas generado")
+		Endif
+	Endproc
+
+	Procedure OnRoles
+		Local lcJson
+		lcJson = This.APIGet("/rols") && ajustar ruta si aplica
+		If !Empty(lcJson)
+			This.FillListFromJson(lcJson)
+			This.LogMsg("Roles cargados")
+		Endif
+	Endproc
+
+	Procedure OnCategories
+		Local lcJson
+		lcJson = This.APIGet("/categoria_producto") && ajustar ruta si aplica
+		If !Empty(lcJson)
+			This.FillListFromJson(lcJson)
+			This.LogMsg("Categorias cargadas")
+		Endif
+	Endproc
+
+	Procedure OnLogout
+		gcToken = ""
+		gcUserEmail = ""
+		gcUserRole = ""
+		This.Release()
+		Do login.prg
+	Endproc
+Enddefine
+
+Procedure ShowDashboard
+	Public goDashboard
+	Local lcPath
+	lcPath = Fullpath("dashboard.prg", Justpath(Sys(16,1)))
+	Set Procedure To (lcPath) Additive
+	If Type("goDashboard") = "O"
+		goDashboard.Release()
+	Endif
+	goDashboard = Newobject("frmDashboard", lcPath)
+	goDashboard.Show()
+Endproc
